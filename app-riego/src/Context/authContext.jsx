@@ -10,6 +10,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../Firebase";
 import { useState } from "react";
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 export const authContext = createContext();
 
@@ -22,21 +23,26 @@ export function AuthProvider({ children }) {
 
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [userFirestore, setUserFirestore] = useState({})
+
 
   const signUp = (email, password) => {
     console.log(email, password);
     createUserWithEmailAndPassword(auth, email, password);
-    //crear ususario firestore
+    NewUser(email);
+    
   };
 
   const login = (email, password) => {
     signInWithEmailAndPassword(auth, email, password);
+    loginUser(email);
   };
 
   useEffect(() => {
     const unsuscribe = onAuthStateChanged(auth, currentUser => {
         setUser(currentUser)
         setLoading(false)
+        loginUser(currentUser.email)
     })
 
     return ()=> unsuscribe();
@@ -51,8 +57,30 @@ export function AuthProvider({ children }) {
     return signInWithPopup(auth, googleProvider)
   }
 
+  const NewUser = (email) => {
+
+    setUserFirestore({
+      email: email,
+      valvulas: [{tiempoRiego: 0, horaRiego: 0}]
+    })
+
+}
+
+const loginUser = (email) => {
+  setUserFirestore({
+    email: email,
+    valvulas: [{tiempoRiego: 0, horaRiego: 0}]
+  })
+
+  console.log(userFirestore)
+}
+
+const findUserData = () => {
+
+}
+
   return (
-    <authContext.Provider value={{ signUp, login, logout, loginWithGoogle, loading, user }}>
+    <authContext.Provider value={{ signUp, login, logout, loginWithGoogle, loading, user, userFirestore }}>
       {children}
     </authContext.Provider>
   );

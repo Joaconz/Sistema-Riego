@@ -1,8 +1,8 @@
-import React from "react";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/authContext";
-import { NewUser } from "../Helpers/NewUser";
 
 const Register = () => {
   const [user, setUser] = useState({
@@ -13,8 +13,20 @@ const Register = () => {
   const navigate = useNavigate();
 
   const [error, setError] = useState();
+  const [userId, setUserId] = useState()
 
-  const { signUp } = useAuth();
+  const { signUp, userFirestore } = useAuth();
+
+  const addUser = () => {
+    const db = getFirestore();
+    const userCollection = collection(db, "users");
+    console.log(userFirestore)
+
+      addDoc(userCollection, userFirestore).then((id) => setUserId(id))
+      .catch((err)=>console.log(err));
+  }
+
+
 
   const handleChange = ({ target: { name, value } }) => {
     setUser({ ...user, [name]: value });
@@ -25,13 +37,10 @@ const Register = () => {
     setError("");
     try {
       await signUp(user.email, user.password);
-      //NewUser(user.email);
+      addUser()
       navigate("/");
     } catch (error) {
       console.log(error.message);
-      /*if (error.code === "auth/internal-error") {
-            setError("Correo invalido")
-        }*/
       setError(error.message);
     }
   };
