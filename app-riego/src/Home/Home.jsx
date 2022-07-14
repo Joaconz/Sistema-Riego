@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAuth } from '../Context/authContext'
 import LoadingSpinnet from '../Helpers/LoadingSpinnet'
+import { NewUser } from '../Helpers/NewUser'
 
 const Home = () => {
 
@@ -21,6 +22,8 @@ const Home = () => {
   return (
     <div>
         <h1>Welcome {user.email}</h1>
+
+
         <button onClick={handleLogout}>logout</button>
     </div>
   )
